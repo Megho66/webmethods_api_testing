@@ -120,6 +120,53 @@ public Response getAccessToken() throws IOException {
 
     }
 
+    @Test (groups = {"Active_Directory"})
+    public void Auth_User() throws IOException{
+        Properties properties= loadproperties();
+
+        getAccessToken();
+        String access_token = getAccessToken().jsonPath().getString("access_token");
+
+        HashMap<String,String> parameters = new HashMap<>();
+        parameters.put("email","TestHR@PTCO.COM.SA");
+        parameters.put("password","cz644x5P");
+        parameters.put("company","PTC");
+
+        Response Auth_User = GET_API_Active_Directory(properties.getProperty("resource_Auth_User"),access_token,parameters);
+
+        Auth_User.then().statusCode(200).log().body();
+        Auth_User.then().body("body.error_document",hasKey("error_code"));
+        Auth_User.then().body("body.emplyee_info",hasKey("employee_id"));
+
+
+
+
+    }
+
+    @Test (groups = {"Active_Directory"})
+    public void Managers_And_Employees() throws IOException{
+        Properties properties= loadproperties();
+
+        getAccessToken();
+        String access_token = getAccessToken().jsonPath().getString("access_token");
+
+        HashMap<String,String> parameters = new HashMap<>();
+        parameters.put("employee_id","11030");
+
+
+        Response Managers_And_Employees = GET_API_Active_Directory(properties.getProperty("resource_Managers_And_Employees"),access_token,parameters);
+
+        Managers_And_Employees.then().statusCode(200).log().body();
+        Managers_And_Employees.then().body("managers_and_direct_reports.error_document",hasKey("error_code"));
+        Managers_And_Employees.then().body("managers_and_direct_reports.message",hasKey("Managers"));
+        Managers_And_Employees.then().body("managers_and_direct_reports.message",hasKey("direct_report"));
+
+
+
+
+
+    }
+    
 
     @Test (groups = {"permissions"})
     public void Get_Permission_Details() throws IOException{
@@ -832,7 +879,16 @@ public Response getAccessToken() throws IOException {
 
 
 
-
+    public Response GET_API_Active_Directory (String resource_name,String access_token,HashMap<String,String> parameters) throws IOException {
+        Properties properties = loadproperties();
+        baseURI = properties.getProperty("PORTAL_ACTIVE_DIRECTORY_BASE_URL");
+        Response r = given().header("Authorization", "Bearer " + access_token)
+                .contentType("application/json")
+                .queryParams(parameters)
+                .when()
+                .get(resource_name);
+        return r ;
+    }
 
     public Response GET_API(String resource_name,String access_token,HashMap<String,String> parameters) throws IOException {
         Properties properties= loadproperties();
