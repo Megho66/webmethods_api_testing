@@ -166,7 +166,160 @@ public Response getAccessToken() throws IOException {
 
 
     }
-    
+
+    @Test (groups = {"PO"})
+    public void PO_Get_User_Notification() throws IOException{
+        Properties properties= loadproperties();
+
+        getAccessToken();
+        String access_token = getAccessToken().jsonPath().getString("access_token");
+
+        HashMap<String,String> parameters = new HashMap<>();
+
+
+        Response PO_Get_User_Notification = GET_API_PO(properties.getProperty("resource_PO_Get_User_Notification"),access_token,parameters);
+
+        PO_Get_User_Notification.then().statusCode(200).log().body();
+        PO_Get_User_Notification.then().body("user_notification.error_document",hasKey("error_code"));
+
+
+    }
+
+    @Test (groups = {"PO"})
+    public void PO_Notification_Take_Action () throws IOException {
+
+        Properties properties= loadproperties();
+        getAccessToken();
+        String access_token = getAccessToken().jsonPath().getString("access_token");
+
+
+        HashMap<String,String> parameters = new HashMap<>();
+
+
+        Response post_Add_BFL= POST_API_PO(properties.getProperty("resource_PO_Notification_Take_Action"),access_token, properties.getProperty("body_po_notification_take_action"), parameters);
+
+
+
+        post_Add_BFL.then().statusCode(200).log().body();
+
+
+    }
+
+    @Test (groups = {"PO"})
+    public void PO_Get_Notification_Details() throws IOException{
+        Properties properties= loadproperties();
+
+        getAccessToken();
+        String access_token = getAccessToken().jsonPath().getString("access_token");
+
+        HashMap<String,String> parameters = new HashMap<>();
+
+
+        Response PO_Get_Notification_Details = GET_API_PO(properties.getProperty("resource_PO_Get_Notification_Details"),access_token,parameters);
+
+        PO_Get_Notification_Details.then().statusCode(200).log().body();
+        PO_Get_Notification_Details.then().body("user_notification.error_document",hasKey("error_code"));
+
+    }
+
+    @Test (groups = {"PO"})
+    public void PO_Get_User_ID() throws IOException{
+        Properties properties= loadproperties();
+
+        getAccessToken();
+        String access_token = getAccessToken().jsonPath().getString("access_token");
+
+        HashMap<String,String> parameters = new HashMap<>();
+
+
+        Response PO_Get_User_ID = GET_API_PO(properties.getProperty("resource_PO_Get_User_ID"),access_token,parameters);
+
+        PO_Get_User_ID.then().statusCode(200).log().body();
+        PO_Get_User_ID.then().body("error_document",hasKey("error_code"));
+
+    }
+
+    @Test (groups = {"Service_Desk"})
+    public void SD_Get_Categories() throws IOException{
+        Properties properties= loadproperties();
+
+        getAccessToken();
+        String access_token = getAccessToken().jsonPath().getString("access_token");
+
+        HashMap<String,String> parameters = new HashMap<>();
+
+
+        Response SD_Get_Categories = GET_API_Service_Desk(properties.getProperty("resource_SD_Get_Categories"),access_token,parameters);
+
+        SD_Get_Categories.then().statusCode(200).log().body();
+        SD_Get_Categories.then().body("categories_list.error_document",hasKey("error_code"));
+        SD_Get_Categories.then().body("categories_list",hasKey("categories"));
+
+
+    }
+
+    @Test (groups = {"Service_Desk"})
+    public void SD_Add_New_Request () throws IOException {
+
+        Properties properties= loadproperties();
+        getAccessToken();
+        String access_token = getAccessToken().jsonPath().getString("access_token");
+
+
+        HashMap<String,String> parameters = new HashMap<>();
+
+
+        Response SD_Add_New_Request= POST_API_Service_Desk(properties.getProperty("resource_SD_Add_New_Request"),access_token, properties.getProperty("body_add_new_request"), parameters);
+
+
+
+        SD_Add_New_Request.then().statusCode(200).log().body();
+        SD_Add_New_Request.then().body("add_request_output.error_document",hasKey("error_code"));
+        SD_Add_New_Request.then().body("add_request_output.request_details",hasKey("id"));
+
+
+    }
+
+    @Test (groups = {"Service_Desk"})
+    public void SD_Get_SubCategories() throws IOException{
+        Properties properties= loadproperties();
+
+        getAccessToken();
+        String access_token = getAccessToken().jsonPath().getString("access_token");
+
+        HashMap<String,String> parameters = new HashMap<>();
+        parameters.put("category","15");
+
+
+        Response SD_Get_SubCategories = GET_API_Service_Desk(properties.getProperty("resource_SD_Get_SubCategories"),access_token,parameters);
+
+        SD_Get_SubCategories.then().statusCode(200).log().body();
+        SD_Get_SubCategories.then().body("subcategories.error_document",hasKey("error_code"));
+        SD_Get_SubCategories.then().body("subcategories",hasKey("subcategories"));
+
+
+    }
+
+    @Test (groups = {"Service_Desk"})
+    public void SD_Get_Sites() throws IOException{
+        Properties properties= loadproperties();
+
+        getAccessToken();
+        String access_token = getAccessToken().jsonPath().getString("access_token");
+
+        HashMap<String,String> parameters = new HashMap<>();
+        parameters.put("category","15");
+
+
+        Response SD_Get_Sites = GET_API_Service_Desk(properties.getProperty("resource_SD_Get_Sites"),access_token,parameters);
+
+        SD_Get_Sites.then().statusCode(200).log().body();
+        SD_Get_Sites.then().body("sites_list.error_document",hasKey("error_code"));
+        SD_Get_Sites.then().body("sites_list",hasKey("sites"));
+
+    }
+
+
 
     @Test (groups = {"permissions"})
     public void Get_Permission_Details() throws IOException{
@@ -889,6 +1042,27 @@ public Response getAccessToken() throws IOException {
                 .get(resource_name);
         return r ;
     }
+    public Response GET_API_PO(String resource_name,String access_token,HashMap<String,String> parameters) throws IOException {
+        Properties properties= loadproperties();
+        baseURI =properties.getProperty("PORTAL_PO_BASE_URL");
+        Response r= given().header("Authorization","Bearer " +access_token)
+                .contentType("application/json")
+                .queryParams(parameters)
+                .when()
+                .get(resource_name);
+
+        return r;
+    }
+    public Response GET_API_Service_Desk (String resource_name,String access_token,HashMap<String,String> parameters) throws IOException {
+        Properties properties = loadproperties();
+        baseURI = properties.getProperty("PORTAL_SERVICE_DESK_BASE_URL");
+        Response r = given().header("Authorization", "Bearer " + access_token)
+                .contentType("application/json")
+                .queryParams(parameters)
+                .when()
+                .get(resource_name);
+        return r ;
+    }
 
     public Response GET_API(String resource_name,String access_token,HashMap<String,String> parameters) throws IOException {
         Properties properties= loadproperties();
@@ -913,6 +1087,29 @@ public Response getAccessToken() throws IOException {
 
     return r;
     }
+    public Response  POST_API_PO (String resource_name,String access_token,String getJsonBody ,HashMap<String,String> parameters) throws IOException {
+
+        Properties properties = loadproperties();
+        baseURI=properties.getProperty("PORTAL_PO_BASE_URL");
+        Response r = given().header("Authorization","Bearer " +access_token)
+                .contentType("application/json").queryParams(parameters).
+                body(getJsonBody).when()
+                .post(resource_name);
+
+        return r;
+    }
+    public Response  POST_API_Service_Desk (String resource_name,String access_token,String getJsonBody ,HashMap<String,String> parameters) throws IOException {
+
+        Properties properties = loadproperties();
+        baseURI=properties.getProperty("PORTAL_SERVICE_DESK_BASE_URL");
+        Response r = given().header("Authorization","Bearer " +access_token)
+                .contentType("application/json").queryParams(parameters).
+                body(getJsonBody).when()
+                .post(resource_name);
+
+        return r;
+    }
+
 }
 
 
