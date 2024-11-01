@@ -1,0 +1,21 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="test">
+    <listeners>
+
+        <listener class-name="Listeners.IInvokedMethod"/>
+
+    </listeners>
+    <test name="testTest">
+
+        <groups>
+            <run>
+
+                <include name="PO"></include>
+            </run>
+        </groups>
+
+        <classes>
+            <class name="WebMethods.passToken"></class>
+        </classes>
+    </test>
+</suite>
